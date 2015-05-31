@@ -1,0 +1,133 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content" tools:context="com.h4_technology.eobee.fragment.HomeFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+
+
+    <RelativeLayout
+        android:id="@+id/rel_home_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+        <ImageView
+            android:id="@+id/img_banner"
+            android:layout_width="match_parent"
+            android:src="@drawable/eob_horiz"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"/>
+        <TextView
+            android:id="@+id/lbl_motto"
+            android:layout_below="@id/img_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/motto"
+            android:textColor="#FFFF99"
+            android:textSize="30sp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
+        <TextView
+            android:id="@+id/lbl_motd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/lbl_motto"
+            android:text="@string/motd"
+            android:background="@drawable/motd_box"
+            android:textSize="20dp"
+            android:textColor="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"/>
+        <LinearLayout
+            android:id="@+id/ll_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lbl_motd"
+            android:orientation="horizontal"
+            android:paddingTop="50dp">
+            <TextView android:id="@+id/lbl_show_providers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textColor="@color/list_item_title"
+                android:text="@string/search_instructions_1"
+                android:textSize="25sp"/>
+            <Spinner
+                android:id="@+id/distance_spinner"
+                style="@style/distance_spinner_style" />
+            <TextView
+                android:id="@+id/lbl_miles_of"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textColor="@color/list_item_title"
+                android:text="@string/search_instructions_2"
+                android:textSize="25sp"/>
+            <EditText
+                android:id="@+id/txt_zip_code"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:hint="Zip Code"
+                android:background="@drawable/rounded_edittext"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_1"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            >
+            <Spinner
+                android:id="@+id/procedures_spinner"
+                android:layout_marginRight="10dp"
+                style="@style/procedure_spinner_style" />
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button"
+                android:text="@string/search"
+                android:textColor="#FFF" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_2">
+            <CheckBox
+                android:id="@+id/chk_use_my_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="or search from my location"
+                android:textSize="25dp"
+                android:textColor="#FFF"/>
+        </LinearLayout>
+        <ListView
+            android:id="@+id/list_procedures"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_below="@id/ll_3"></ListView>
+
+
+    </RelativeLayout>
+</FrameLayout>
