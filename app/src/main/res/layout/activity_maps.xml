@@ -1,5 +1,85 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:id="@+id/map"
-    tools:context="com.h4_technology.eobee.activity.MapsActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment" />
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".6"
+        android:id="@+id/map"
+        tools:context="com.h4_technology.eobee.activity.MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
+    <LinearLayout
+        android:layout_height="0dp"
+        android:layout_weight=".4"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="#FFF">
+            <TextView
+                android:id="@+id/procedure_name_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Procedure: Knee Replacement"
+                android:textSize="25sp"
+                android:textColor="#006666"
+                android:gravity="center"
+                android:background="@drawable/motd_box"/>
+            <TableLayout
+                android:id="@+id/procedure_prices_table"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center">
+                <TableRow>
+                    <TextView
+                        android:text="Price Range"
+                        android:padding="3dip"
+                        android:textColor="#FFF"
+                        />
+                    <TextView
+                        android:text="Average Amount"
+                        android:padding="3dip"
+                        android:textColor="#FFF"/>
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/lbl_procedure_price_range"
+                        android:text="$250-$300"
+                        android:padding="3dip" />
+                    <TextView
+                        android:id="@+id/lbl_procedure_avg_price"
+                        android:text="$275"
+                        android:padding="3dip" />
+                </TableRow>
+            </TableLayout>
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <TextView
+                android:id="@+id/provider_name"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Jeffrey D Akerson M.D."/>
+            <RatingBar
+                android:id="@+id/provider_rating_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/lbl_provider_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2206 Longo Dr SUITE 201 Bellevue, NE"/>
+        <Button
+            android:id="@+id/btn_read_provider_reviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read Doctor Reviews"
+            android:textColor="#FFF"
+            android:background="@drawable/rounded_button"/>
+    </LinearLayout>
+
+</LinearLayout>

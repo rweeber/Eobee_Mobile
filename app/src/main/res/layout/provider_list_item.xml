@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_margin="10dp"
+    android:background="@drawable/provider_list_box"
+    android:padding="5dp">
+    <TextView
+        android:id="@+id/avg_charge"
+        android:background="@drawable/motd_box"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:textColor="@color/eobee_blue"
+        android:textAppearance="@android:style/TextAppearance.Medium"/>
+    <TextView
+        android:id="@+id/last_org_name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_toRightOf="@id/avg_charge"/>
+    <TextView
+        android:id="@+id/distance"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentRight="true"/>
+</RelativeLayout>

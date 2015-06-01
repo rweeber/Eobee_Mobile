@@ -1,5 +1,6 @@
 package com.h4_technology.eobee.activity;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v4.widget.DrawerLayout;
@@ -19,13 +20,15 @@ import com.h4_technology.eobee.fragment.FavoritesFragment;
 import com.h4_technology.eobee.fragment.HomeFragment;
 import com.h4_technology.eobee.R;
 import com.h4_technology.eobee.adapter.NavDrawerListAdapter;
+import com.h4_technology.eobee.fragment.ProviderFragment;
 import com.h4_technology.eobee.fragment.TOUFragment;
 import com.h4_technology.eobee.fragment.UserDetailFragment;
 import com.h4_technology.eobee.model.NavDrawerItem;
+import com.h4_technology.eobee.model.ZipcodeLatLongModel;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity  implements HomeFragment.OnFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity  implements HomeFragment.OnFragmentInteractionListener, ProviderFragment.OnFragmentInteractionListener {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -46,7 +49,7 @@ public class MainActivity extends ActionBarActivity  implements HomeFragment.OnF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("MainActivity", "OnCreate");
+
         setContentView(R.layout.activity_main);
 
         mTitle = getTitle();
@@ -109,7 +112,16 @@ public class MainActivity extends ActionBarActivity  implements HomeFragment.OnF
         displayView(0);
     }
 
-    public void onDrawerInteraction(int position) {
+    @Override
+    public void onProviderSelected(ZipcodeLatLongModel model) {
+        Fragment fragment = new ProviderFragment();
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.frame_container, fragment).commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
 
     }
 

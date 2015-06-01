@@ -26,10 +26,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.h4_technology.eobee.DataHelper;
 import com.h4_technology.eobee.R;
 import com.h4_technology.eobee.adapter.ProcedureListAdapter;
 import com.h4_technology.eobee.model.ProcedureListItem;
+import com.h4_technology.eobee.model.ProviderListItem;
 import com.h4_technology.eobee.model.TopSearchTermModel;
 import com.h4_technology.eobee.model.ZipcodeLatLongModel;
 import com.h4_technology.eobee.singleton.NetworkService;
@@ -40,17 +42,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomeFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,15 +57,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     private ListView listView;
     private EditText zipcode;
     private CheckBox useMyLocation;
-    private EditText distance;
 
     private OnFragmentInteractionListener mListener;
     private TopSearchTermModel[] mTopSearchTerms;
     private ZipcodeLatLongModel[] mZipLatLongs;
+    private ZipcodeLatLongModel mGeography;
+    private ProcedureListItem mProcedureListItem;
     private Activity mActivity;
     private RelativeLayout relativeLayout;
     private ArrayList<String> distances;
     private List<ProcedureListItem> procedureNames;
+    private int distance;
+    private int position;
 
 
     /**
@@ -106,11 +105,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("HomeFragment", "OnCreate");
-
-        procedureNames = new ArrayList();
+        /*
         procedureNames.add(new ProcedureListItem("Procedure name 1"));
         procedureNames.add(new ProcedureListItem("Procedure name 2"));
-        procedureNames.add(new ProcedureListItem("Procedure name 3"));
+        procedureNames.add(new ProcedureListItem("Procedure name 3"));*/
 
 
     }
@@ -161,6 +159,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
                                     updateUI();
                                 }
                             } catch (JSONException ex) {
+
+                                spin.setVisibility(View.GONE);
                                 Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_LONG).show();
                             }
                         }
@@ -170,6 +170,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
                         public void onErrorResponse(VolleyError error) {
                             // TODO Auto-generated method stub
                             Log.e("HomeFragment", error.getMessage());
+
+                            spin.setVisibility(View.GONE);
                         }
                     });
 
@@ -177,17 +179,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
             queue.add(jsArrRequest);
 
         } else {
+            spin.setVisibility(View.GONE);
             Toast.makeText(getActivity(), "Network connectivity not detected", Toast.LENGTH_LONG).show();
         }
 
         return V;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(int position) {
-        if (mListener != null) {
-            mListener.onDrawerInteraction(position);
-        }
     }
 
     @Override
@@ -248,84 +244,213 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_search:
-                ProcedureListAdapter procedureAdapter = new ProcedureListAdapter(this.getActivity(), this.procedureNames);
 
-                searchProcedures(this.mTopSearchTerms[spinner.getSelectedItemPosition()]);
-
-
-                this.useMyLocation = (CheckBox) mActivity.findViewById(R.id.chk_use_my_location);
-                if(this.useMyLocation.isChecked()) {
-                    //use current location
-                } else { //get zipcode
-                    this.zipcode = (EditText) mActivity.findViewById(R.id.txt_zip_code);
-                    if(this.zipcode.getText().length() <= 0){
-                        Toast.makeText(mActivity, "zipcode was empty and use my location turned off", Toast.LENGTH_LONG).show();
-                    } else {
-                        //zipcode not empty
-                        if (isOnline()){
-                            spin.setVisibility(View.VISIBLE);
-
-                            RequestQueue queue = NetworkService.getInstance(getActivity().getApplicationContext()).getRequestQueue();
-
-                            String url = DataHelper.getBaseUrl() + "api/Geography/?zipcode=" + this.zipcode.getText();
-                            JSONArray jsArray = null;
-                            JsonArrayRequest jsArrRequest = new JsonArrayRequest
-                                    (Request.Method.GET, url, jsArray, new Response.Listener<JSONArray>() {
-                                        @Override
-                                        public void onResponse(JSONArray response) {
-                                            Log.d("Response: ", response.toString());
-                                            try {
-                                                if(response.length() > 0) {
-
-                                                    mZipLatLongs = new ZipcodeLatLongModel[response.length()];
-                                                    for (int i = 0; i < response.length(); i++) {
-                                                        JSONObject jsObject = response.getJSONObject(i);
-                                                        ZipcodeLatLongModel model = new ZipcodeLatLongModel(jsObject.getString("Zipcode"),
-                                                                                                            jsObject.getDouble("Latitude"),
-                                                                                                            jsObject.getDouble("Longitude"));
-                                                        mZipLatLongs[i] = model;
-                                                    }
-                                                }
-                                            } catch (JSONException ex) {
-                                                Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                                            }
-                                        }
-                                    }, new Response.ErrorListener() {
-
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            // TODO Auto-generated method stub
-                                            Log.e("HomeFragment", error.getMessage());
-                                        }
-                                    });
-
-
-                            queue.add(jsArrRequest);
-                        } else {
-                            Toast.makeText(mActivity, "network down or turned off", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }
-
-                /*listView = (ListView) mActivity.findViewById(R.id.list_procedures);
-                listView.setVisibility(View.VISIBLE);
-                listView.setAdapter(procedureAdapter);
-                listView.setOnItemClickListener(this);*/
+                searchProcedures(
+                        this.mTopSearchTerms[spinner.
+                                getSelectedItemPosition()]
+                );
                 break;
             default:
                 break;
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ProcedureListItem item = this.procedureNames.get(position);
+    private void searchProcedures(TopSearchTermModel item) {
+        if (isOnline()){
+            spin = (ProgressBar) mActivity.findViewById(R.id.progressBar1);
+            spin.setVisibility(View.VISIBLE);
 
+            RequestQueue queue = NetworkService.getInstance(getActivity().getApplicationContext()).getRequestQueue();
+
+            String url = DataHelper.getBaseUrl() + "api/Search/?searchId=" + item.mSearchTermId;
+            JSONArray jsArray = null;
+            JsonArrayRequest jsArrRequest = new JsonArrayRequest
+                    (Request.Method.GET, url, jsArray, new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d("Response: ", response.toString());
+                            try {
+                                if(response.length() > 0) {
+                                    procedureNames = new ArrayList();
+                                    for (int i = 0; i < response.length(); i++) {
+                                        JSONObject jsObject = response.getJSONObject(i);
+                                        ProcedureListItem model = new ProcedureListItem(
+                                                jsObject.getString("ProcedureDescription"),
+                                                jsObject.getInt("ProcedureDescriptionId")
+                                        );
+
+                                        procedureNames.add(model);
+                                    }
+                                    populateList();
+                                }
+                            } catch (JSONException ex) {
+
+                                spin.setVisibility(View.GONE);
+                                Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO Auto-generated method stub
+
+                            //spin.setVisibility(View.GONE);
+                            Log.e("HomeFragment", error.getMessage());
+                        }
+                    });
+
+
+            queue.add(jsArrRequest);
+
+        } else {
+            spin.setVisibility(View.GONE);
+            Toast.makeText(getActivity(), "Network connectivity not detected", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void populateList() {
+        listView = (ListView) mActivity.findViewById(R.id.list_procedures);
+        listView.setOnItemClickListener(this);
+        ProcedureListAdapter adapter = new ProcedureListAdapter(mActivity,this.procedureNames);
+        listView.setAdapter(adapter);
+        listView.setVisibility(View.VISIBLE);
+        spin.setVisibility(View.GONE);
+    }
+
+
+
+    private void buildProviderFragment(final ZipcodeLatLongModel geography) {
+
+        RequestQueue queue = NetworkService.getInstance(getActivity().getApplicationContext()).getRequestQueue();
+        mGeography = geography;
+        mProcedureListItem = procedureNames.get(this.position);
+        String url = DataHelper.getBaseUrl() + "api/Search/";
+
+        StringRequest myReq = new StringRequest(Request.Method.POST,
+                url,
+                successListener(),
+                errorListener()) {
+            protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("ProcedureDescriptionId", String.valueOf(mProcedureListItem.getProcedureDescriptionId()));
+                params.put("Latitude", String.valueOf(geography.latitude));
+                params.put("Longitude", String.valueOf(geography.longitude));
+                params.put("Distance", String.valueOf(distance));
+                return params;
+            }
+        };
+        queue.add(myReq);
+    }
+    public Response.Listener<String> successListener() {
+        return new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response){
+                /*if (mListener != null) {
+                    mListener.onProviderSelected(mGeography);
+                }*/
+                if (response.length() > 0) {
+                    Log.d("HomeFragment",response);
+                    try {
+                        JSONArray providers = new JSONArray(response);
+                        ProviderListItem.getNewIstanceList(providers);
+                    } catch (JSONException ex) {
+
+                        Log.e("HomeFragment",ex.getMessage());
+                        spin = (ProgressBar) mActivity.findViewById(R.id.progressBar1);
+                        spin.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+
+        };
+    }
+    private Response.ErrorListener errorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                spin.setVisibility(View.GONE);
+                Log.e("HomeFragment", error.getMessage());
+            }
+        };
 
     }
 
-    private void searchProcedures(TopSearchTermModel item) {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        this.position = position;
 
+        this.useMyLocation = (CheckBox) mActivity.findViewById(R.id.chk_use_my_location);
+        Spinner distanceSpinner = (Spinner) mActivity.findViewById(R.id.distance_spinner);
+        this.distance = Integer.valueOf(distances.get(distanceSpinner.getSelectedItemPosition()));
+
+        if(this.useMyLocation.isChecked()) {
+            //use current location
+        } else { //get zipcode
+            this.zipcode = (EditText) mActivity.findViewById(R.id.txt_zip_code);
+            if(this.zipcode.getText().length() <= 0){
+                Toast.makeText(mActivity, "zipcode was empty and use my location turned off", Toast.LENGTH_LONG).show();
+            } else {
+                //zipcode not empty
+
+                relativeLayout.setVisibility(View.INVISIBLE);
+
+                if (isOnline()){
+                    spin.setVisibility(View.VISIBLE);
+
+                    RequestQueue queue = NetworkService.getInstance(getActivity().getApplicationContext()).getRequestQueue();
+
+                    String url = DataHelper.getBaseUrl() + "api/geography/?zipcode=" + this.zipcode.getText();
+                    JSONArray jsArray = null;
+                    JsonArrayRequest jsArrRequest = new JsonArrayRequest
+                            (Request.Method.GET, url, jsArray, new Response.Listener<JSONArray>() {
+                                @Override
+                                public void onResponse(JSONArray response) {
+                                    Log.d("Response: ", response.toString());
+                                    try {
+                                        if(response.length() > 0) {
+
+                                            mZipLatLongs = new ZipcodeLatLongModel[response.length()];
+                                            for (int i = 0; i < response.length(); i++) {
+                                                JSONObject jsObject = response.getJSONObject(i);
+                                                ZipcodeLatLongModel model = new ZipcodeLatLongModel(jsObject.getString("Zipcode"),
+                                                        jsObject.getDouble("Latitude"),
+                                                        jsObject.getDouble("Longitude"));
+                                                mZipLatLongs[i] = model;
+                                            }
+
+                                            buildProviderFragment(mZipLatLongs[0]);
+                                        }else {
+
+                                            Log.e("HomeFragment onResponse", String.valueOf(response.length()));
+                                        }
+                                    } catch (JSONException ex) {
+                                        spin.setVisibility(View.GONE);
+                                        relativeLayout.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    // TODO Auto-generated method stub
+                                    //spin.setVisibility(View.GONE);
+                                    Log.e("HomeFragment", error.getMessage());
+                                    relativeLayout.setVisibility(View.VISIBLE);
+                                }
+                            });
+
+
+                    queue.add(jsArrRequest);
+                } else {
+                    spin.setVisibility(View.GONE);
+                    relativeLayout.setVisibility(View.VISIBLE);
+                    Toast.makeText(mActivity, "network down or turned off", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     /**
@@ -341,7 +466,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
 
-        public void onDrawerInteraction(int position);
+        public void onProviderSelected(ZipcodeLatLongModel model);
     }
 
 
